@@ -31,17 +31,23 @@ DEPS_PCDIR="$ROOT/work/android-deps/lib/pkgconfig"
 # X11 WSI: headers + pkg-config only, libxcb & co. are dlopened at runtime (csf-v11/083).
 X11_PCDIR="$ROOT/work/android-deps-x11/lib/pkgconfig"
 [ -f "$X11_PCDIR/xcb.pc" ] || "$ROOT/scripts/prepare-x11-headers.sh" "$ROOT/work/android-deps-x11" >&2
-if [ -d "$DEPS_PCDIR" ]; then
-  python3 - "$BDIR.cross.ini" "$DEPS_PCDIR" "$X11_PCDIR" <<'EOF'
+# Pin the target pkg-config search path. pkg_config_libdir REPLACES the host
+# defaults, so host /usr .pc files (libdrm, libudev, zlib, ...) can never leak
+# glibc/x86 paths into the Bionic build. Include only trees that exist:
+# work/android-deps (NDK-built deps, optional; no script builds it) and the
+# X11 header tree (headers only — see csf-v11/083, libxcb is dlopened).
+PCDIRS=""
+[ -d "$DEPS_PCDIR" ] && PCDIRS="'$DEPS_PCDIR'"
+[ -f "$X11_PCDIR/xcb.pc" ] && PCDIRS="${PCDIRS:+$PCDIRS, }'$X11_PCDIR'"
+python3 - "$BDIR.cross.ini" "$PCDIRS" <<'EOF'
 import sys
-p, d, x = sys.argv[1], sys.argv[2], sys.argv[3]
+p, dirs = sys.argv[1], sys.argv[2]
 t = open(p).read()
-line = f"pkg_config_libdir = ['{d}', '{x}']\n"
+line = "pkg_config_libdir = [" + dirs + "]\n"
 assert '[properties]' in t
 t = t.replace('[properties]', '[properties]\n' + line, 1)
 open(p, 'w').write(t)
 EOF
-fi
 export PKG_CONFIG_PATH="$DEPS_PCDIR:${PKG_CONFIG_PATH:-}"
 mkdir -p "$DDIR"
 # Host codegen tools (mesa_clc, vtn_bindgen2, panfrost_compile) must come from a native build:
