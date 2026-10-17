@@ -104,7 +104,18 @@ The ICD is proven loadable on this device by PanProbe 1.2.7
 ## Build from source
 
 Prerequisites (this dev machine): NDK `28.2.13676358`
-(`~/Android/Sdk/ndk/`), `meson` + `ninja`, host LLVM/clang, `python3`, `git`.
+(`~/Android/Sdk/ndk/`), `meson` + `ninja`, host LLVM/clang, `python3`, `git`,
+plus **LLVMSPIRVLib** (`spirv-llvm-translator`) matching the host LLVM major —
+Mesa's native `mesa_clc` requires it. Without root you can extract the distro
+package locally; `build-g710.sh` auto-detects `~/.local/spirv-llvm-translator`
+(override with `LLVMSPIRV_PREFIX`):
+
+```sh
+mkdir -p ~/.local/spirv-llvm-translator
+curl -sSL <mirror>/spirv-llvm-translator-<ver>-x86_64.pkg.tar.zst | tar --zstd -x -C ~/.local/spirv-llvm-translator
+sed -i "s|^prefix=/usr|prefix=$HOME/.local/spirv-llvm-translator/usr|" \
+  ~/.local/spirv-llvm-translator/usr/lib/pkgconfig/LLVMSPIRVLib.pc
+```
 
 ```sh
 ./scripts/build-g710.sh                 # fetch pinned Mesa -> apply series -> NDK build -> static checks

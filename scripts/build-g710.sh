@@ -24,6 +24,21 @@ if [ -z "${ANDROID_NDK_ROOT:-}" ]; then
 fi
 export ANDROID_NDK_ROOT
 
+# Host LLVMSPIRVLib is required by the native mesa_clc build (Mesa with_clc).
+# If it is not installed system-wide, use a local extraction of the distro
+# package (e.g. `spirv-llvm-translator`, extracted under
+# ~/.local/spirv-llvm-translator — override with LLVMSPIRV_PREFIX):
+#   tar --zstd -x -C ~/.local/spirv-llvm-translator <pkg.tar.zst>
+#   sed -i "s|^prefix=/usr|prefix=$HOME/.local/spirv-llvm-translator/usr|" \
+#     ~/.local/spirv-llvm-translator/usr/lib/pkgconfig/LLVMSPIRVLib.pc
+SPV="${LLVMSPIRV_PREFIX:-$HOME/.local/spirv-llvm-translator}/usr"
+if ! pkg-config --exists LLVMSPIRVLib 2>/dev/null && [ -d "$SPV/lib/pkgconfig" ]; then
+    export PKG_CONFIG_PATH="$SPV/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+    export CMAKE_PREFIX_PATH="$SPV:${CMAKE_PREFIX_PATH:-}"
+    export LD_LIBRARY_PATH="$SPV/lib:${LD_LIBRARY_PATH:-}"
+    echo "build-g710: using local LLVMSPIRVLib from $SPV"
+fi
+
 # fetch-mesa.sh resets the tree to the pinned commit, so re-running the whole
 # chain is safe (patch application is not idempotent by itself).
 "$ROOT/scripts/fetch-mesa.sh"
