@@ -1,0 +1,12 @@
+{
+  "profile": "g615-v11-csf",
+  "abi": "android-aarch64-bionic",
+  "mesaCommit": "5a07217f034b3e50d8c7c7794f97a2df1742613b",
+  "mesaVersion": "26.3.0-devel",
+  "patchSeriesId": "sha256:37ac82079b31857609a292577988e30f2754e6838aad0e6a73beb7db08c75d1c",
+  "buildHost": "Linux abhaybyte-82k2 6.18.54-2-lts #1 SMP PREEMPT_DYNAMIC Thu, 01 Oct 2026 17:58:36 +0000 x86_64 GNU/Linux",
+  "date": "2026-10-13T12:43:55.860041+00:00",
+  "ndk": "22.1.7171670\n25.1.8937393\n27.2.12479018\n29.0.14206865\n30.0.14904198",
+  "binarySha256": "f550a0066d7c3cd1afbb9be0f84d643f6dc2ccf73f8f369216217593f2a0a187",
+  "runtimeFeatureMatrix": "runtime-feature-matrix.json"
+}

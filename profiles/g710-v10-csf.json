@@ -1,0 +1,38 @@
+{
+  "profile": "g710-v10-csf",
+  "device": "OnePlus Nord 3",
+  "model": "CPH2493",
+  "soc": "MediaTek Dimensity 9000",
+  "socId": "MT6983",
+  "gpu": "Mali-G710 MC10",
+  "gpuIdString": "Mali-G710 10 cores r0p0 0xA862",
+  "coreMask": "0x770017",
+  "panvkDeviceId": "0xa8620004 (matches the G710 model row; Pixel 7 class)",
+  "panArch": 10,
+  "frontend": "CSF",
+  "kernelInterface": "mali_kbase",
+  "node": "/dev/mali0",
+  "nodeMode": "crw-rw-rw- system graphics",
+  "nodeSeLabel": "u:object_r:gpu_device:s0",
+  "android": "16 (SDK 36, OxygenOS)",
+  "kernel": "5.10.246-android12 GKI + MediaTek mali_kbase_mt6983",
+  "root": "KernelSU Next (adb su)",
+  "probeResult": {
+    "nodeExists": "yes",
+    "rootShellUid0": { "O_RDONLY": "OK", "O_RDWR": "OK" },
+    "shellUid": { "O_RDONLY": "OK", "O_RDWR": "OK" },
+    "appUid": "loading the ICD from app data works (PanProbe 1.2.7, \"Imported .so\")"
+  },
+  "selectionKey": {
+    "pan_arch": 10,
+    "gpu_id": "0xa862",
+    "frontend": "CSF",
+    "kbase_uapi": "MT6983 vendor kbase"
+  },
+  "validation": {
+    "panprobe": "38 pass / 0 fail / 0 skip (1.2.7)",
+    "vulkan": "1.4.363, conformance 1.4.1.2",
+    "gtavPort": "boots and renders; native BC path hangs the GPU (see docs/G710-MC10-EXPERIMENTS.md)"
+  },
+  "status": "bring-up (runs the csf-v11-series build through runtime arch switches; native csf-v10 series is future work)"
+}

@@ -1,0 +1,12 @@
+# Files shipped in this directory (sha256)
+#
+# Verified byte-for-byte against the upstream release manifest
+# (upstream-RELEASE-SHA256SUMS) on 2026-10-17.
+
+f550a0066d7c3cd1afbb9be0f84d643f6dc2ccf73f8f369216217593f2a0a187  libvulkan_panfrost-android-aarch64.so
+f11bf9e5eb77bbb41f3c8b094b55f16b011462784ff3577b0f6cc32b682d9c14  panfrost_icd.aarch64.json
+
+# The upstream release also shipped (not included here):
+#   c671fb2c24fef8f262d8b31e730312d8fb8650fde94e2bb5701dc9b4844750fc  PanVK-Kbase-Android-g615-v11-csf-v0.1.0-rc3-lowmem-5a07217f.adpkg.zip
+#     -> metadata extracted into adpkg/ (meta.json, SOURCE.json, VALIDATION.json, MANIFEST.json)
+#   glibc variant, emulator zip, PanProbe screenshots (see upstream release page)
