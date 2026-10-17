@@ -122,6 +122,7 @@ sed -i "s|^prefix=/usr|prefix=$HOME/.local/spirv-llvm-translator/usr|" \
 # or step by step:
 ./scripts/fetch-mesa.sh                 # shallow clone + detach at sources.lock mesaCommit
 ./scripts/apply-patches.sh --profile g615-v11-csf
+./scripts/bootstrap-android-deps.sh     # zlib shim + static libdrm for the target
 ./scripts/build-android.sh --profile g615-v11-csf --api 35
 ```
 
@@ -138,6 +139,13 @@ Notes:
   CSF but **not bit-identical** — this tree's ids:
   `g710-v10-csf` → `sha256:981e5f36…`, `g615-v11-csf` → `sha256:a4d9cd4e…`
   (recorded in `sources.lock` → `slimTree`).
+- The ICD is **self-contained**: `scripts/bootstrap-android-deps.sh` builds
+  libdrm **static** for the target and links it in — the series keeps
+  runtime-dead DRM call sites compiled in (`uses_kbase` branches, device
+  enumeration, debug paths), and Android app namespaces cannot load
+  `/system/lib64/libdrm.so`. The resulting `DT_NEEDED` matches the release
+  binary: `liblog`, `libnativewindow`, `libsync`, `libm`, `libz`, `libdl`,
+  `libc`.
 - `--api 35` matches the shipped binary's `minApi`. `--api 29` builds are
   possible but unproven upstream.
 - The first build bootstraps host codegen tools (mesa_clc, vtn_bindgen2,

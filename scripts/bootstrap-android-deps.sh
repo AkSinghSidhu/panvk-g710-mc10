@@ -7,10 +7,15 @@
 # Contents:
 #   zlib    — .pc shim only: the NDK sysroot provides zlib.h/libz.so, and
 #             bionic ships libz.so at runtime (the shipped ICD links it).
-#   libdrm  — built from source with the NDK. Mesa hard-requires libdrm at
-#             configure time for this configuration (any Vulkan driver ->
-#             with_dri2), but the kbase build references nothing from it, so
-#             the linker (--as-needed) keeps it out of DT_NEEDED.
+#   libdrm  — built from source with the NDK as a STATIC library. Mesa
+#             hard-requires libdrm at configure time for this configuration
+#             (any Vulkan driver -> with_dri2), and the series keeps
+#             runtime-dead DRM call sites compiled in (uses_kbase branches,
+#             device enumeration, debug paths), so real drm references reach
+#             the link. Static linking keeps the ICD self-contained: no
+#             libdrm.so in DT_NEEDED (Android app namespaces cannot load
+#             /system/lib64/libdrm.so) — matching the release binary's
+#             dependency set (liblog/libnativewindow/libsync/libm/libz).
 #
 # Usage: ./scripts/bootstrap-android-deps.sh [--api 35] [--out work/android-deps]
 set -eu
@@ -76,7 +81,8 @@ pkg_config_libdir = []
 EOF
 rm -rf "$DRM_SRC/build-android"
 meson setup "$DRM_SRC/build-android" "$DRM_SRC" --cross-file "$CROSS" \
-    --prefix "$OUT" -Dbuildtype=release \
+    --prefix "$OUT" -Dbuildtype=release -Ddefault_library=static \
+    -Dc_args=-fvisibility=hidden \
     -Dtests=false -Dinstall-test-programs=false -Dudev=false \
     -Dman-pages=disabled -Dvalgrind=disabled -Dcairo-tests=disabled \
     -Dintel=disabled -Dradeon=disabled -Damdgpu=disabled -Dnouveau=disabled \
@@ -86,4 +92,4 @@ ninja -C "$DRM_SRC/build-android" install
 echo "$DRM_COMMIT" > "$OUT/libdrm-commit.txt"
 
 ls -la "$OUT/lib/pkgconfig"
-echo "OK out=$OUT (zlib shim + libdrm $DRM_COMMIT)"
+echo "OK out=$OUT (zlib shim + static libdrm $DRM_COMMIT)"

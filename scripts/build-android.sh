@@ -28,14 +28,17 @@ sed "s/aarch64-linux-android[0-9]*-clang/$CC_TRIPLE/g" "$ROOT/meson/android-aarc
 # Pin target pkg-config to our NDK-built deps prefix so host /usr/lib .pc
 # files (zlib, libudev, ...) can never leak host paths into the link.
 DEPS_PCDIR="$ROOT/work/android-deps/lib/pkgconfig"
+# Target deps (zlib shim + static libdrm) are needed at configure/link time;
+# bootstrap them on demand (same pattern as the X11 header tree below).
+[ -f "$DEPS_PCDIR/libdrm.pc" ] || "$ROOT/scripts/bootstrap-android-deps.sh" --out "$ROOT/work/android-deps" >&2
 # X11 WSI: headers + pkg-config only, libxcb & co. are dlopened at runtime (csf-v11/083).
 X11_PCDIR="$ROOT/work/android-deps-x11/lib/pkgconfig"
 [ -f "$X11_PCDIR/xcb.pc" ] || "$ROOT/scripts/prepare-x11-headers.sh" "$ROOT/work/android-deps-x11" >&2
 # Pin the target pkg-config search path. pkg_config_libdir REPLACES the host
 # defaults, so host /usr .pc files (libdrm, libudev, zlib, ...) can never leak
 # glibc/x86 paths into the Bionic build. Include only trees that exist:
-# work/android-deps (NDK-built deps, optional; no script builds it) and the
-# X11 header tree (headers only — see csf-v11/083, libxcb is dlopened).
+# work/android-deps (zlib shim + static libdrm via bootstrap-android-deps.sh)
+# and the X11 header tree (headers only — see csf-v11/083, libxcb is dlopened).
 PCDIRS=""
 [ -d "$DEPS_PCDIR" ] && PCDIRS="'$DEPS_PCDIR'"
 [ -f "$X11_PCDIR/xcb.pc" ] && PCDIRS="${PCDIRS:+$PCDIRS, }'$X11_PCDIR'"
