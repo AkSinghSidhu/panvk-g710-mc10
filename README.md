@@ -30,8 +30,8 @@ runs it. A dedicated `csf-v10` family does not exist yet (see
 
 Bring-up works: the ICD loads from app storage, device creation succeeds,
 Vulkan **1.4.363** (conformance 1.4.1.2), PanProbe 1.2.7 reports
-**38 pass / 0 fail / 0 skip**, and the GTA V port boots and renders through it.
-It is **not** the port's default driver — the stock ARM blob stays default,
+**38 pass / 0 fail / 0 skip**, and our application boots and renders through it.
+It is **not** the app's default driver — the stock ARM blob stays default,
 because of the issues below (details, logs and root-cause work:
 [docs/G710-MC10-EXPERIMENTS.md](docs/G710-MC10-EXPERIMENTS.md)).
 
@@ -43,18 +43,18 @@ because of the issues below (details, logs and root-cause work:
    is lost. Upstream's BC worklog says the path (fragment/compute decode into a
    compressed `bc_shadow` plane + AFRC) was **only validated on G615 (v11)** —
    it has never been exercised on G710 (v10) until us, and it hangs there.
-   - Workaround used by the port: **decode BC on the CPU** (`MUGUET_BC_SOFT=1`),
+   - Workaround used by our app: **decode BC on the CPU** (`MUGUET_BC_SOFT=1`),
      so no BC image ever reaches the driver.
    - Debug knob: `PANVK_BC_AFRC=0|16|24|32` (0 = exact decode; 16/24/32 force a
      coding-unit size for all formats).
-   - Why it matters: native BC keeps textures compressed in GPU memory. Our port
+   - Why it matters: native BC keeps textures compressed in GPU memory. Our app
      currently CPU-decodes BC → RGBA8, a 4–8× blow-up that is the main cause of
-     the low-memory killer killing the game. Fixing this hang is the big prize.
+     the low-memory killer terminating it. Fixing this hang is the big prize.
 2. **Timeline/sync wedges.** wgpu-hal + this driver can wedge on timeline waits
-   under load; the port uses `MUGUET_NO_TIMELINE=1` (fence-pool path) for PanVK runs.
+   under load; we use `MUGUET_NO_TIMELINE=1` (fence-pool path) for PanVK runs.
 3. **First-launch shader compile storm.** ~600 pipelines compile on the first
    run (with a compile storm freeze when the disk cache is absent). Set
-   `MESA_SHADER_CACHE_DIR` to a persistent directory — the port uses
+   `MESA_SHADER_CACHE_DIR` to a persistent directory — we use
    `<app files>/mesa-cache` (614 files / 5.3 MB after warm-up).
 4. **Performance** is below the stock blob on this SoC today. PanVK remains an
    experiment; blob stays the default.
@@ -66,7 +66,7 @@ profiles/
   g710-v10-csf.json          our device facts (v10 CSF, MT6983, probe results) — target profile
   g615-v11-csf.json          the profile the deployed binary was built with (kept verbatim)
 patches/                     CSF build series: common, android, kbase-common, app-loader, wsi, csf, csf-v11
-scripts/                     fetch-mesa (pins Mesa 5a07217f) · apply-patches · build-android (NDK) · build-g710 (wrapper) · bootstrap-host-tools · validate-binary · compute-patch-series-id
+scripts/                     fetch-mesa (pins Mesa 5a07217f) · apply-patches · bootstrap-android-deps · prepare-x11-headers · bootstrap-host-tools · build-android (NDK) · build-g710 (wrapper) · validate-binary · compute-patch-series-id
 meson/android-aarch64.ini    Bionic aarch64 cross file used by build-android
 sources.lock                 Mesa pin + upstream patch-series id + this tree's trimmed series ids
 release/                     the exact binary we deploy + ICD json + sha256s + adpkg provenance (meta/SOURCE/VALIDATION/MANIFEST)
@@ -77,15 +77,15 @@ device/bc-perf*              standalone BC decode/sampling benchmark (needed to 
 
 ## Use the prebuilt driver on the phone
 
-The shipped ICD works from app data (no root/system change needed). For the
-GTA V port (`com.alihammoud21.gtavmobile`):
+The shipped ICD works from app data (no root/system change needed). Example for
+an app that loads the ICD via a path file read at startup:
 
 ```sh
 adb push release/libvulkan_panfrost-android-aarch64.so \
-  /sdcard/Android/data/com.alihammoud21.gtavmobile/files/vulkan/libvulkan_panfrost.so
-adb shell "echo /sdcard/Android/data/com.alihammoud21.gtavmobile/files/vulkan/libvulkan_panfrost.so \
-  > /sdcard/Android/data/com.alihammoud21.gtavmobile/files/vk-icd.txt"
-# restart the game; the port sets MUGUET_VK_ICD from vk-icd.txt and mini-loads the ICD
+  /sdcard/Android/data/<your.app.id>/files/vulkan/libvulkan_panfrost.so
+adb shell "echo /sdcard/Android/data/<your.app.id>/files/vulkan/libvulkan_panfrost.so \
+  > /sdcard/Android/data/<your.app.id>/files/vk-icd.txt"
+# restart the app; the runtime reads vk-icd.txt, sets MUGUET_VK_ICD and mini-loads the ICD
 ```
 
 Recommended env alongside (`files/gpu-env.txt`, one `KEY=VALUE` per line):
@@ -98,7 +98,7 @@ MUGUET_NO_TIMELINE=1    # avoid timeline-wait wedges under wgpu-hal
 To go back to the stock blob: delete `files/vk-icd.txt`.
 
 The ICD is proven loadable on this device by PanProbe 1.2.7
-("Imported .so"), and by our own port's mini-loader (design in
+("Imported .so"), and by our own in-app mini-loader (design in
 [docs/G710-MC10-EXPERIMENTS.md](docs/G710-MC10-EXPERIMENTS.md) §"Gate 2").
 
 ## Build from source
@@ -179,9 +179,13 @@ upstream marks the planned v10 slot), arch-gate the BC emulation off for v10
 - Shipped files are byte-identical to the upstream release:
   `release/CHECKSUMS.txt` (sha256, verified 2026-10-17).
 - Licensing is **mixed** — read [NOTICE.md](NOTICE.md) before redistributing.
-  Repository scaffolding is MIT; `patches/**` are Mesa-derived (Mesa's
-  licenses); kbase UAPI headers vendored in `patches/kbase-common/files/` are
-  `GPL-2.0 WITH Linux-syscall-note`.
+  This tree is a derived, slim subset of the upstream repo: upstream
+  scaffolding is MIT (`LICENSES/MIT.txt`; modifications made here are added
+  under the same terms), `patches/**` are Mesa-derived (Mesa's licenses), and
+  the kbase UAPI headers vendored in `patches/kbase-common/files/` are
+  `GPL-2.0 WITH Linux-syscall-note`. Upstream components that are not part of
+  this tree (launcher apps incl. the LGPL Winlator X server, JM families)
+  carry no obligations here.
 
 ## TODO (when we continue driver work)
 
@@ -189,5 +193,5 @@ upstream marks the planned v10 slot), arch-gate the BC emulation off for v10
       `PANVK_BC_AFRC=0/16/24/32`, then arch-gate or fix the v10 path.
 - [ ] Split a `csf-v10` family; move `g710-v10-csf` off the v11 series.
 - [ ] Rebuild in this repo and A/B vs the release `.so` on the phone.
-- [ ] If driver BC lands: re-test the port's GPU memory (GL mtrack) and the
+- [ ] If driver BC lands: re-test our app's GPU memory (GL mtrack) and the
       low-memory-killer pressure with 4–8× smaller textures.

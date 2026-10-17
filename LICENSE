@@ -1,0 +1,14 @@
+This repository is not uniformly licensed.
+
+It is a device-specific, slim subset of panvk-kbase-android
+(https://github.com/zenithblue-oss/panvk-kbase-android) and mixes:
+
+- MIT for repository scaffolding and this tree's modifications
+  (see LICENSES/MIT.txt),
+- Mesa's upstream licenses for Mesa-derived patches under patches/**
+  (see LICENSES/README.md),
+- GPL-2.0 WITH Linux-syscall-note for the vendored kbase UAPI headers under
+  patches/kbase-common/files/ only.
+
+The authoritative description is NOTICE.md, with per-tree details in
+LICENSES/README.md and the license texts in LICENSES/.

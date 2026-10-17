@@ -32,7 +32,7 @@
   "validation": {
     "panprobe": "38 pass / 0 fail / 0 skip (1.2.7)",
     "vulkan": "1.4.363, conformance 1.4.1.2",
-    "gtavPort": "boots and renders; native BC path hangs the GPU (see docs/G710-MC10-EXPERIMENTS.md)"
+    "enginePort": "boots and renders; native BC path hangs the GPU (see docs/G710-MC10-EXPERIMENTS.md)"
   },
   "status": "bring-up (runs the csf-v11-series build through runtime arch switches; native csf-v10 series is future work)"
 }

@@ -1,10 +1,10 @@
 # PanVK (open Mesa Vulkan) on the OnePlus Nord 3 — experiment log & integration design
 
-> Snapshot copied into `panvk-g710-mc10` on 2026-10-17 from the GTA V port
+> Snapshot copied into `panvk-g710-mc10` on 2026-10-17 from the private port
 > workspace. The workspace copy is canonical; update that first, then re-copy.
 
 Project: https://github.com/zenithblue-oss/panvk-kbase-android
-Goal: replace the stock ARM Mali Vulkan blob with open Mesa **PanVK** for the GTA V port,
+Goal: replace the stock ARM Mali Vulkan blob with open Mesa **PanVK** for our application,
 gain Vulkan 1.4 features, and evaluate the GPU-side BC texture decode path.
 
 Driver release used: `panvk-kbase-v0.1.0-rc3-lowmem` (Mesa 26.3.0-devel, git `5a07217f03`).
@@ -41,7 +41,7 @@ Downloads (host): `panvk-downloads/` — verified against the release `SHA256SUM
 
 So: no port needed for the driver; MC7→MC10 is a non-issue; app-UID loading works.
 
-## Gate 2 — integration into the GTA port (design)
+## Gate 2 — integration into the application (design)
 
 The release `.so` is **ICD-style only** (`vk_icdNegotiateLoaderICDInterfaceVersion`,
 `vk_icdGetInstanceProcAddr`, `vk_icdGetPhysicalDeviceProcAddr`; no `vkGetInstanceProcAddr`).
@@ -263,7 +263,7 @@ textures. Build also adds self-reporting: `gpu tex X MB buf Y MB` (recounted fro
 
 ## Risks
 
-- PanProbe tests ≠ GTA V: clip distances, atomics, read_write storage textures, large
+- PanProbe tests ≠ real content: clip distances, atomics, read_write storage textures, large
   workloads, real WSI — first in-game run may hit driver bugs (hangs → `logcat -s Mali vulkan`).
 - Performance may be *worse* than the r32 blob; measure before adopting. Keep the blob default.
 - RC3 is a release candidate; pin the exact `.so` and keep SHA256SUMS.
