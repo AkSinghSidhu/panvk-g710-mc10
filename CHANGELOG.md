@@ -1,5 +1,30 @@
 # Changelog
 
+## panvk-g710-mc10 slim tree (bring-up)
+
+Local bring-up tree for the OnePlus Nord 3 (Mali-G710 MC10, Dimensity 9000 / MT6983, mali_kbase):
+144 patches on Mesa `5a07217f034b`. It is the CSF part of the upstream series — families `common`,
+`android`, `kbase-common`, `app-loader`, `wsi`, `csf`, `csf-v11`, patch files unchanged from
+upstream — with the JM families (`jm-v7`, `jm-v7-wip`, `jm-v9`) and `bcn-layer` not included. Not a
+release; the stock blob stays the default Vulkan driver on the phone.
+
+### Added since rc3-lowmem
+
+- `csf-v11/186` — on ENOTTY, retry dma-buf `MEM_IMPORT` with the MediaTek SLC/PBHA layout (40-byte
+  `union kbase_ioctl_mem_import`, latched per process; Arm kernels keep the standard 24-byte path).
+  Build-only; no v14 device was available.
+- `g710-v10-csf` device profile (Nord 3 facts + probe results) and `docs/G710-MC10-EXPERIMENTS.md`
+  (on-device bring-up log: kbase/uAPI facts, WSI/display path, native BC hang notes).
+- `scripts/build-g710.sh` one-shot rebuild (fetch → apply → NDK build → validate) and the
+  `slimTree` record in `sources.lock` (per-profile `patchSeriesId`).
+
+### Known issues on G710
+
+See "Known issues on G710" in the README: native BC decode hangs the GPU (CPU decode via
+`MUGUET_BC_SOFT=1` until fixed), timeline waits can wedge under load (`MUGUET_NO_TIMELINE=1` is used
+for PanVK runs), and first runs pay a shader compile storm. Performance is below the stock blob
+today.
+
 ## panvk-kbase-v0.1.0-rc3-lowmem (release candidate)
 
 RC3 plus one patch (csf-v11/185), 173 patches on Mesa `5a07217f034b`. Not faster; it trades some BCn
