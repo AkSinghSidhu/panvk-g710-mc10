@@ -1,3 +1,19 @@
+From: panvk-kbase-android worker <panvk-worker@localhost>
+Subject: [PATCH android 015] android-stub: static hardware stub, -ENOENT from hw_get_module
+
+Purpose: make the Android stub's hw_get_module() tell the truth. The old
+ stub returned 0 and left *module untouched, so u_gralloc_fallback_create()
+ read that as "gralloc hwmodule found" and dereferenced the (still null)
+ module. Return -ENOENT with *module = NULL so discovery takes the fallback
+ path it is meant to take ("No gralloc hwmodule detected (video buffers
+ won't be supported)").
+
+The stub also stops pretending to be a HAL shared library: compile
+ hardware_stub.cpp as a static library linked into the ICD, so the symbol
+ is always resolved in-process and the ICD carries no runtime libhardware
+ dependency (DT_NEEDED of the built ICD: liblog, libnativewindow, libsync,
+ libm, libz, libdl, libc).
+
 diff --git a/src/android_stub/hardware_stub.cpp b/src/android_stub/hardware_stub.cpp
 index 4cb973fd2ac..b20f8de9ccc 100644
 --- a/src/android_stub/hardware_stub.cpp

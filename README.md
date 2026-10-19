@@ -136,8 +136,8 @@ Notes:
   provenance is in [release/adpkg/SOURCE.json](release/adpkg/SOURCE.json)
   (`patchSeriesId sha256:37ac82…`). This tree keeps only the **CSF families**
   (144 patches); a rebuild here is expected to be functionally equivalent for
-  CSF but **not bit-identical** — this tree's ids:
-  `g710-v10-csf` → `sha256:981e5f36…`, `g615-v11-csf` → `sha256:a4d9cd4e…`
+  CSF but **not bit-identical** — this tree's id:
+  `g710-v10-csf` → `sha256:d3c6b6fa…`
   (recorded in `sources.lock` → `slimTree`).
 - The ICD is **self-contained**: `scripts/bootstrap-android-deps.sh` builds
   libdrm **static** for the target and links it in — the series keeps

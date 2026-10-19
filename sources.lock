@@ -8,8 +8,7 @@
   "slimTree": {
     "description": "panvk-g710-mc10: this tree keeps only the CSF patch families needed by the Mali-G710 MC10 (JM families removed); the deployed binary came from the upstream full series (see release/adpkg/SOURCE.json)",
     "patchSeriesId": {
-      "g710-v10-csf": "sha256:981e5f36e4b427b70c8872e796ea25d296d93bc04811eb114a53452817cfccb1",
-      "g615-v11-csf": "sha256:a4d9cd4ebff11da0daab5fa53b577154137439eb63e5e972de80b5e333ca7c0e"
+      "g710-v10-csf": "sha256:d3c6b6fa2ab830bac1f419fea8e9300b1da2d9e7121d1962e06f641dd4b9feab"
     }
   },
   "referenceRepos": {
@@ -55,6 +54,7 @@
   "notes": [
     "No release may be built from an unrecorded moving branch.",
     "patchSeriesId is sha256 of mesaCommit + profile JSON + patches/** (scripts/compute-patch-series-id.py).",
-    "Secondary history repos are intentionally unpinned; they are not build inputs."
+    "Secondary history repos are intentionally unpinned; they are not build inputs.",
+    "Build history: the 2026-10-18 slim package predates the android/015 header block; its as-built series id is sha256:c36d3cec94d642f6200ab3ea3eb4942a569971028de36b20ef8f817d859eaa48. (The 2026-10-18 adpkg meta stamps sha256:a4d9cd4e…, the g615 profile's id, not the as-built id.)"
   ]
 }
