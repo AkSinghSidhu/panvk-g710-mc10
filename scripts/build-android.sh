@@ -1,6 +1,6 @@
 #!/bin/sh
 # build-android.sh — Android/Bionic arm64-v8a PanVK (hot-loadable ICD + Android/X11 WSI + AHB + Kbase)
-# Usage: ./scripts/build-android.sh --profile g615-v11-csf [--api 29] [--ndk $ANDROID_NDK_ROOT]
+# Usage: ./scripts/build-android.sh --profile g710-v10-csf [--api 29] [--ndk $ANDROID_NDK_ROOT]
 # Default API 29: bionic's <threads.h> then inlines call_once & co. (libc
 # exports them only from API 30), so the ICD loads on Android 10.
 set -eu

@@ -4,13 +4,12 @@
 # the Bionic arm64-v8a ICD with the Android NDK.
 #
 # Usage: ./scripts/build-g710.sh
-#   PROFILE=g615-v11-csf   build profile (default; the one the deployed binary
-#                          was built with — see README)
+#   PROFILE=g710-v10-csf   build profile (default; the only profile in this tree)
 #   API=35                 Android API level (default 35; the shipped .so is
 #                          minApi 35)
 set -eu
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PROFILE="${PROFILE:-g615-v11-csf}"
+PROFILE="${PROFILE:-g710-v10-csf}"
 API="${API:-35}"
 
 if [ -z "${ANDROID_NDK_ROOT:-}" ]; then

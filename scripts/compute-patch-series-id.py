@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """compute-patch-series-id.py — Deterministic SHA-256 hash of patch inputs.
 
-Usage: python3 scripts/compute-patch-series-id.py [--profile g615-v11-csf]
+Usage: python3 scripts/compute-patch-series-id.py [--profile g710-v10-csf]
 Output format: sha256:<64 hex chars>
 """
 import argparse
@@ -12,7 +12,7 @@ import sys
 
 def main():
     parser = argparse.ArgumentParser(description="Compute deterministic patch series ID")
-    parser.add_argument("--profile", default="g615-v11-csf", help="Device profile name")
+    parser.add_argument("--profile", default="g710-v10-csf", help="Device profile name")
     parser.add_argument("--root", default=None, help="Repository root path")
     parser.add_argument("--bare", action="store_true", help="Print only 64 hex chars without sha256: prefix")
     args = parser.parse_args()

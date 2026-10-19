@@ -1,6 +1,6 @@
 #!/bin/sh
 # apply-patches.sh — apply qualified patch series for a profile, fail hard on drift
-# Usage: ./scripts/apply-patches.sh --profile g615-v11-csf [--mesa work/mesa]
+# Usage: ./scripts/apply-patches.sh --profile g710-v10-csf [--mesa work/mesa]
 set -eu
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROFILE=""; MESA="$ROOT/work/mesa"

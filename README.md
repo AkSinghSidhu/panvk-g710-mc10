@@ -64,7 +64,6 @@ because of the issues below (details, logs and root-cause work:
 ```
 profiles/
   g710-v10-csf.json          our device facts (v10 CSF, MT6983, probe results) — target profile
-  g615-v11-csf.json          the profile the deployed binary was built with (kept verbatim)
 patches/                     CSF build series: common, android, kbase-common, app-loader, wsi, csf, csf-v11
 scripts/                     fetch-mesa (pins Mesa 5a07217f) · apply-patches · bootstrap-android-deps · prepare-x11-headers · bootstrap-host-tools · build-android (NDK) · build-g710 (wrapper) · validate-binary · compute-patch-series-id
 meson/android-aarch64.ini    Bionic aarch64 cross file used by build-android
@@ -121,9 +120,9 @@ sed -i "s|^prefix=/usr|prefix=$HOME/.local/spirv-llvm-translator/usr|" \
 ./scripts/build-g710.sh                 # fetch pinned Mesa -> apply series -> NDK build -> static checks
 # or step by step:
 ./scripts/fetch-mesa.sh                 # shallow clone + detach at sources.lock mesaCommit
-./scripts/apply-patches.sh --profile g615-v11-csf
+./scripts/apply-patches.sh --profile g710-v10-csf
 ./scripts/bootstrap-android-deps.sh     # zlib shim + static libdrm for the target
-./scripts/build-android.sh --profile g615-v11-csf --api 35
+./scripts/build-android.sh --profile g710-v10-csf --api 35
 ```
 
 Output: `dist/android-<profile>/libvulkan_panfrost.so` (aarch64, bionic,
